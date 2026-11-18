@@ -1,0 +1,10 @@
+# compiled programs
+*.exe
+*.o
+*.out
+p0[1-9]
+p1[0-2]
+library
+
+# files created when running the programs
+positions.txt
