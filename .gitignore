@@ -4,7 +4,7 @@
 *.out
 p0[1-9]
 p1[0-2]
-library
+portal
 
 # files created when running the programs
 positions.txt

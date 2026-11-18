@@ -15,7 +15,7 @@ Khushboo Nandanwar | Roll No. 49 | AIDS-C
 | 09 | Generic stack using templates | p09_template_stack.cpp |
 | 10 | Custom exceptions: banking transaction | p10_bank_exceptions.cpp |
 | 11 | CSV student records using file I/O | p11_csv_records.cpp, students.csv |
-| 12 | Mini project: Library Management System | mini-project/ |
+| 12 | Mini project: Student Portal | mini-project/ |
 
 ## How to compile and run
 Any practical compiles on its own, for example:

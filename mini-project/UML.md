@@ -1,26 +1,24 @@
-# UML Class Diagram - Library Management System
+# UML Class Diagram - Student Portal
 
 ```
- +---------------------------+        +------------------------------+
- |   <<abstract>>            |        |  LibraryError                |
- |   LibraryItem             |        |  (derives runtime_error)     |
- |---------------------------|        +------------------------------+
- | # id : int                |                      ^ throws
- | # title : string          |                      |
- |---------------------------|        +------------------------------+
- | + display() = 0           |        |  Library                     |
- | + getId(), getTitle()     |        |------------------------------|
- +---------------------------+        | - books : map<int, Book>     |
-              ^                       | - fileName : string          |
-              | inherits              |------------------------------|
- +---------------------------+  1   * | + load() / save()            |
- |   Book                    |<>------| + addBook(id, title, author) |
- |---------------------------|        | + find(id) : Book&           |
- | - author : string         |        | + searchByTitle(word)        |
- | - available : bool        |        | + listAll()                  |
- |---------------------------|        +------------------------------+
- | + display() override      |
- | + issue(), giveBack()     |
- | + toCSV()                 |
- +---------------------------+
+ +--------------------------+          +-------------------------------+
+ |  Person                  |          |  PortalError                  |
+ |--------------------------|          |  (derives runtime_error)      |
+ | # name : string          |          +-------------------------------+
+ |--------------------------|                         ^ throws
+ | + show() : virtual       |                         |
+ +--------------------------+          +-------------------------------+
+              ^                        |  Portal                       |
+              | inherits               |-------------------------------|
+ +--------------------------+  1    *  | - students : vector<Student>  |
+ |  Student                 |<>--------| - fileName : string           |
+ |--------------------------|          |-------------------------------|
+ | - id : int               |          | + load()                      |
+ | - course : string        |          | + save()                      |
+ | - marks : int            |          | + add(id, name, course, marks)|
+ |--------------------------|          | + find(id) : Student          |
+ | + grade() : string       |          | + showAll()                   |
+ | + show() override        |          +-------------------------------+
+ | + toCSV() : string       |
+ +--------------------------+
 ```
