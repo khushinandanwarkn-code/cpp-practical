@@ -1,61 +1,60 @@
 // Practical 05 - Single and Multilevel Inheritance
-// Person -> Student -> GraduateStudent
 // Khushboo Nandanwar | Roll No. 49 | AIDS-C
 #include <iostream>
 #include <string>
 using namespace std;
 
 class Person {
-protected:              // protected so derived classes can use them, outsiders can't
+protected:
     string name;
     int age;
 public:
-    Person(string n, int a) : name(n), age(a) {}
-    void showPerson() const {
-        cout << "  Name      : " << name << "\n";
-        cout << "  Age       : " << age << "\n";
+    Person(string n, int a) {
+        name = n;
+        age = a;
+    }
+    void showPerson() {
+        cout << "Name: " << name << ", Age: " << age << endl;
     }
 };
 
-// single inheritance: Student IS-A Person
+// single inheritance
 class Student : public Person {
 protected:
-    string studentId;
+    int id;
     string course;
 public:
-    Student(string n, int a, string id, string c)
-        : Person(n, a), studentId(id), course(c) {}   // base part built first
-    void showStudent() const {
-        showPerson();                                   // reused from Person
-        cout << "  Student ID: " << studentId << "\n";
-        cout << "  Course    : " << course << "\n";
+    Student(string n, int a, int i, string c) : Person(n, a) {
+        id = i;
+        course = c;
+    }
+    void showStudent() {
+        showPerson();
+        cout << "ID: " << id << ", Course: " << course << endl;
     }
 };
 
-// multilevel inheritance: GraduateStudent IS-A Student IS-A Person
+// multilevel inheritance
 class GraduateStudent : public Student {
-    string researchTopic;
-    string supervisor;
+    string topic;
 public:
-    GraduateStudent(string n, int a, string id, string c, string topic, string guide)
-        : Student(n, a, id, c), researchTopic(topic), supervisor(guide) {}
-    void showGraduate() const {
-        showStudent();                                  // which in turn calls showPerson()
-        cout << "  Research  : " << researchTopic << "\n";
-        cout << "  Supervisor: " << supervisor << "\n";
-        cout << "  (name '" << name << "' came all the way down from Person)\n";
+    GraduateStudent(string n, int a, int i, string c, string t) : Student(n, a, i, c) {
+        topic = t;
+    }
+    void showGraduate() {
+        showStudent();
+        cout << "Research: " << topic << endl;
     }
 };
 
 int main() {
-    Student s("Khushboo Nandanwar", 19, "AIDS-C-49", "B.Tech AI & Data Science");
-    GraduateStudent g("Aditi Kulkarni", 23, "MT-2026-07", "M.Tech Data Science",
-                      "Crop disease detection using CNNs", "Dr. S. Patil");
+    Student s("Khushboo", 19, 49, "AIDS");
+    GraduateStudent g("Aditi", 23, 7, "M.Tech", "Machine Learning");
 
-    cout << "Student (single inheritance: Person -> Student)\n";
+    cout << "--- Student ---" << endl;
     s.showStudent();
 
-    cout << "\nGraduateStudent (multilevel: Person -> Student -> GraduateStudent)\n";
+    cout << "\n--- Graduate Student ---" << endl;
     g.showGraduate();
     return 0;
 }

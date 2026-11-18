@@ -1,109 +1,95 @@
-// Practical 03 - Constructors and the Rule of Five
+// Practical 03 - Constructors and Rule of Five
 // Khushboo Nandanwar | Roll No. 49 | AIDS-C
 #include <iostream>
-#include <utility>
 using namespace std;
 
-class IntArray {
+class Array {
     int* data;
-    size_t size;
-public:
-    static int liveBuffers;   // my own small leak counter
+    int size;
 
+public:
     // default constructor
-    IntArray() : data(nullptr), size(0) {
-        cout << "Default constructor (empty array)\n";
+    Array() {
+        size = 0;
+        data = nullptr;
+        cout << "Default constructor" << endl;
     }
 
     // parameterized constructor
-    IntArray(size_t n, int startValue) : data(new int[n]), size(n) {
-        for (size_t i = 0; i < n; i++) data[i] = startValue + (int)i;
-        liveBuffers++;
-        cout << "Parameterized constructor (size " << n << ")\n";
+    Array(int n) {
+        size = n;
+        data = new int[n];
+        for (int i = 0; i < n; i++) data[i] = i + 1;
+        cout << "Parameterized constructor" << endl;
     }
 
-    // 1) destructor - frees the memory this object owns
-    ~IntArray() {
-        if (data) liveBuffers--;
-        delete[] data;
+    // 1. copy constructor (deep copy - new memory)
+    Array(const Array& other) {
+        size = other.size;
+        data = new int[size];
+        for (int i = 0; i < size; i++) data[i] = other.data[i];
+        cout << "Copy constructor" << endl;
     }
 
-    // 2) copy constructor - deep copy, so both objects get their OWN array
-    IntArray(const IntArray& other) : data(nullptr), size(other.size) {
-        if (other.data) {
-            data = new int[size];
-            for (size_t i = 0; i < size; i++) data[i] = other.data[i];
-            liveBuffers++;
-        }
-        cout << "Copy constructor (deep copy)\n";
-    }
-
-    // 3) copy assignment - copy first, then swap, so a failed copy loses nothing
-    IntArray& operator=(const IntArray& other) {
-        cout << "Copy assignment (deep copy)\n";
-        if (this == &other) return *this;   // a = a should do nothing
-        IntArray temp(other);
-        swap(data, temp.data);
-        swap(size, temp.size);
-        return *this;                       // temp's destructor frees our old array
-    }
-
-    // 4) move constructor - just take the pointer, no new allocation
-    IntArray(IntArray&& other) noexcept : data(other.data), size(other.size) {
-        other.data = nullptr;
-        other.size = 0;
-        cout << "Move constructor (ownership transferred)\n";
-    }
-
-    // 5) move assignment - free ours, take theirs
-    IntArray& operator=(IntArray&& other) noexcept {
-        cout << "Move assignment (ownership transferred)\n";
+    // 2. copy assignment
+    Array& operator=(const Array& other) {
         if (this != &other) {
-            if (data) liveBuffers--;
             delete[] data;
-            data = other.data;
             size = other.size;
-            other.data = nullptr;
-            other.size = 0;
+            data = new int[size];
+            for (int i = 0; i < size; i++) data[i] = other.data[i];
         }
+        cout << "Copy assignment" << endl;
         return *this;
     }
 
-    void set(size_t i, int v) { if (i < size) data[i] = v; }
+    // 3. move constructor (just take the other's memory)
+    Array(Array&& other) noexcept {
+        size = other.size;
+        data = other.data;
+        other.data = nullptr;
+        other.size = 0;
+        cout << "Move constructor" << endl;
+    }
 
-    void print(const char* label) const {
-        cout << "  " << label << " = [";
-        for (size_t i = 0; i < size; i++) cout << data[i] << (i + 1 < size ? ", " : "");
-        cout << "]  (size " << size << ")\n";
+    // 4. move assignment
+    Array& operator=(Array&& other) noexcept {
+        if (this != &other) {
+            delete[] data;
+            size = other.size;
+            data = other.data;
+            other.data = nullptr;
+            other.size = 0;
+        }
+        cout << "Move assignment" << endl;
+        return *this;
+    }
+
+    // 5. destructor
+    ~Array() {
+        if (data != nullptr) cout << "Destructor: memory freed" << endl;
+        delete[] data;
+    }
+
+    void show() {
+        cout << "  [ ";
+        for (int i = 0; i < size; i++) cout << data[i] << " ";
+        cout << "]" << endl;
     }
 };
-int IntArray::liveBuffers = 0;
 
 int main() {
-    {
-        IntArray a;                 // default
-        IntArray b(4, 10);          // parameterized
-        b.print("b");
+    Array a;              // default
+    Array b(3);           // parameterized
+    Array c(b);           // copy constructor
+    a = b;                // copy assignment
+    Array d(move(c));     // move constructor
+    Array e;
+    e = move(d);          // move assignment
 
-        IntArray c(b);              // copy constructor
-        c.set(0, 99);               // change c only
-        b.print("b");
-        c.print("c (changed index 0)");
-
-        a = b;                      // copy assignment
-        a.print("a");
-
-        IntArray d(std::move(c));   // move constructor
-        d.print("d");
-        c.print("c after move");
-
-        IntArray e;
-        e = std::move(d);           // move assignment
-        e.print("e");
-        d.print("d after move");
-
-        cout << "Buffers alive before leaving scope: " << IntArray::liveBuffers << "\n";
-    }
-    cout << "Buffers alive after all objects destroyed: " << IntArray::liveBuffers << "\n";
-    return 0;
+    cout << "b:"; b.show();
+    cout << "a:"; a.show();
+    cout << "e:"; e.show();
+    cout << "c (after move):"; c.show();
+    return 0;             // destructors run here
 }

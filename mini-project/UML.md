@@ -1,24 +1,23 @@
 # UML Class Diagram - Student Portal
 
 ```
- +--------------------------+          +-------------------------------+
- |  Person                  |          |  PortalError                  |
- |--------------------------|          |  (derives runtime_error)      |
- | # name : string          |          +-------------------------------+
- |--------------------------|                         ^ throws
- | + show() : virtual       |                         |
- +--------------------------+          +-------------------------------+
-              ^                        |  Portal                       |
-              | inherits               |-------------------------------|
- +--------------------------+  1    *  | - students : vector<Student>  |
- |  Student                 |<>--------| - fileName : string           |
- |--------------------------|          |-------------------------------|
- | - id : int               |          | + load()                      |
- | - course : string        |          | + save()                      |
- | - marks : int            |          | + add(id, name, course, marks)|
- |--------------------------|          | + find(id) : Student          |
- | + grade() : string       |          | + showAll()                   |
- | + show() override        |          +-------------------------------+
- | + toCSV() : string       |
- +--------------------------+
+  +----------------------+
+  |       Person         |
+  |----------------------|
+  | # name : string      |
+  |----------------------|
+  | + show() : virtual   |
+  +----------------------+
+             ^
+             | inherits
+  +----------------------+          +---------------------------+
+  |       Student        |  stored  |   vector<Student>         |
+  |----------------------|<---------|   students                |
+  | + id : int           |   in     +---------------------------+
+  | + marks : int        |             used by: loadFile(),
+  |----------------------|             saveFile(), main()
+  | + getName() : string |
+  | + grade() : string   |
+  | + show() override    |
+  +----------------------+
 ```

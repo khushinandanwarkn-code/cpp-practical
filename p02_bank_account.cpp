@@ -1,76 +1,51 @@
-// Practical 02 - Classes, Access Specifiers and Member Functions
+// Practical 02 - Classes and Access Specifiers
 // Khushboo Nandanwar | Roll No. 49 | AIDS-C
 #include <iostream>
 #include <string>
 using namespace std;
 
 class BankAccount {
-private:
-    // private: nobody outside the class should change these directly,
-    // otherwise anyone could just write  acc.balance = 1000000;
-    string accountNumber;
-    string holderName;
+private:            // hidden, can't be changed directly from main()
+    int accNo;
+    string name;
     double balance;
 
-public:
-    // public: these functions are the only way to use the object
-    BankAccount(string accNo, string name, double openingBalance) {
-        accountNumber = accNo;
-        holderName = name;
-        if (openingBalance < 0) {
-            cout << "Opening balance can't be negative, setting it to 0.\n";
-            openingBalance = 0;
-        }
-        balance = openingBalance;
+public:             // these functions can be used from main()
+    BankAccount(int a, string n, double b) {
+        accNo = a;
+        name = n;
+        balance = (b < 0) ? 0 : b;   // no negative opening balance
     }
 
     void deposit(double amount) {
-        if (amount <= 0) {
-            cout << "  Deposit failed: amount must be more than 0\n";
-            return;
-        }
-        balance += amount;
-        cout << "  Deposited Rs." << amount << " into " << accountNumber << "\n";
+        if (amount > 0)
+            balance += amount;
+        else
+            cout << "Invalid deposit amount" << endl;
     }
 
     void withdraw(double amount) {
-        if (amount <= 0) {
-            cout << "  Withdraw failed: amount must be more than 0\n";
-        } else if (amount > balance) {
-            cout << "  Withdraw failed: not enough balance in " << accountNumber << "\n";
-        } else {
+        if (amount > balance)
+            cout << "Not enough balance in account " << accNo << endl;
+        else
             balance -= amount;
-            cout << "  Withdrew Rs." << amount << " from " << accountNumber << "\n";
-        }
     }
 
-    double getBalance() const { return balance; }
-
-    void display() const {
-        cout << "  [" << accountNumber << "] " << holderName
-             << " | Balance: Rs." << balance << "\n";
+    void display() {
+        cout << accNo << " | " << name << " | Balance: " << balance << endl;
     }
 };
 
 int main() {
-    BankAccount acc1("SB-4901", "Khushboo Nandanwar", 5000);
-    BankAccount acc2("SB-4902", "Riya Deshmukh", 1200);
+    BankAccount a1(101, "Khushboo", 5000);
+    BankAccount a2(102, "Riya", 1000);
 
-    cout << "Opening details:\n";
-    acc1.display();
-    acc2.display();
+    a1.deposit(2000);
+    a1.withdraw(1500);
+    a2.withdraw(3000);   // more than balance
+    a2.deposit(-100);    // wrong amount
 
-    cout << "\nTransactions:\n";
-    acc1.deposit(2500);
-    acc1.withdraw(1000);
-    acc2.withdraw(2000);   // should fail, only 1200 in the account
-    acc2.deposit(-50);     // should fail, negative amount
-    acc2.deposit(800);
-
-    cout << "\nFinal details:\n";
-    acc1.display();
-    acc2.display();
-
-    // acc1.balance = 99999;   // compile error: 'balance' is private
+    a1.display();
+    a2.display();
     return 0;
 }

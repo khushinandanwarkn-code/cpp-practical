@@ -1,65 +1,48 @@
 // Practical 08 - Factory Design Pattern
-// Use case: a ride-booking app creates the right vehicle from what the user picks
 // Khushboo Nandanwar | Roll No. 49 | AIDS-C
 #include <iostream>
-#include <memory>
 #include <string>
-#include <stdexcept>
 using namespace std;
 
 class Vehicle {
 public:
-    virtual string type() const = 0;
-    virtual int capacity() const = 0;
-    virtual double farePerKm() const = 0;
-    double fare(double km) const { return km * farePerKm(); }
+    virtual void info() = 0;
     virtual ~Vehicle() {}
 };
 
 class Bike : public Vehicle {
 public:
-    string type() const override { return "Bike"; }
-    int capacity() const override { return 1; }
-    double farePerKm() const override { return 7; }
+    void info() { cout << "Bike: 2 wheels, 1 seat" << endl; }
 };
 
-class Auto : public Vehicle {
+class Car : public Vehicle {
 public:
-    string type() const override { return "Auto"; }
-    int capacity() const override { return 3; }
-    double farePerKm() const override { return 12; }
+    void info() { cout << "Car: 4 wheels, 4 seats" << endl; }
 };
 
-class Cab : public Vehicle {
+class Bus : public Vehicle {
 public:
-    string type() const override { return "Cab"; }
-    int capacity() const override { return 4; }
-    double farePerKm() const override { return 18; }
+    void info() { cout << "Bus: 6 wheels, 40 seats" << endl; }
 };
 
-// The factory: the ONLY place that knows which class to "new"
-class VehicleFactory {
-public:
-    static unique_ptr<Vehicle> create(const string& choice) {
-        if (choice == "bike") return make_unique<Bike>();
-        if (choice == "auto") return make_unique<Auto>();
-        if (choice == "cab")  return make_unique<Cab>();
-        throw invalid_argument("No vehicle of type '" + choice + "'");
-    }
-};
+// the factory - decides which object to create
+Vehicle* createVehicle(string type) {
+    if (type == "bike") return new Bike();
+    if (type == "car")  return new Car();
+    if (type == "bus")  return new Bus();
+    return nullptr;     // unknown type
+}
 
 int main() {
-    string requests[] = {"bike", "cab", "auto", "helicopter"};
-    double distanceKm = 8.5;   // e.g. Deccan to Hinjewadi side, roughly
+    string orders[4] = {"bike", "car", "bus", "train"};
 
-    for (const string& r : requests) {
-        try {
-            unique_ptr<Vehicle> v = VehicleFactory::create(r);   // main never says "new Cab"
-            cout << "Requested '" << r << "' -> got " << v->type()
-                 << " | seats: " << v->capacity()
-                 << " | fare for " << distanceKm << " km: Rs." << v->fare(distanceKm) << "\n";
-        } catch (const invalid_argument& e) {
-            cout << "Requested '" << r << "' -> error: " << e.what() << "\n";
+    for (int i = 0; i < 4; i++) {
+        Vehicle* v = createVehicle(orders[i]);
+        if (v != nullptr) {
+            v->info();
+            delete v;
+        } else {
+            cout << "Sorry, no vehicle called " << orders[i] << endl;
         }
     }
     return 0;

@@ -1,185 +1,121 @@
-// Practical 12 - Mini Project: Student Portal (Option C)
+// Practical 12 - Mini Project: Student Portal
 // Khushboo Nandanwar | Roll No. 49 | AIDS-C
-//
-// A small console app for a class teacher: add students, see the whole list
-// with grades, and search a student by ID. Everything is saved in
-// students_data.csv, so the data is still there the next time it runs.
-
+// Add students, see all with grades, search by ID.
+// Data is saved in students_data.csv.
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <iomanip>
 #include <vector>
 #include <string>
 #include <stdexcept>
-#include <limits>
-#include <cstdlib>
 using namespace std;
 
-// my own exception, used whenever the user enters something wrong
-class PortalError : public runtime_error {
-public:
-    PortalError(const string& msg) : runtime_error(msg) {}
-};
-
-// base class - every person has a name
 class Person {
 protected:
     string name;
 public:
-    Person(string n) : name(n) {}
-    virtual void show() const { cout << name << "\n"; }
+    Person(string n) { name = n; }
+    virtual void show() { cout << name << endl; }
     virtual ~Person() {}
 };
 
-// Student IS-A Person, plus ID, course and marks
 class Student : public Person {
-    int id;
-    string course;
-    int marks;
 public:
-    Student(int i, string n, string c, int m) : Person(n), id(i), course(c), marks(m) {}
+    int id, marks;
 
-    int getId() const { return id; }
-    int getMarks() const { return marks; }
+    Student(int i, string n, int m) : Person(n) {
+        id = i;
+        marks = m;
+    }
 
-    string grade() const {
+    string getName() { return name; }
+
+    string grade() {
         if (marks >= 75) return "A";
         if (marks >= 60) return "B";
-        if (marks >= 50) return "C";
-        if (marks >= 40) return "D";
+        if (marks >= 40) return "C";
         return "F";
     }
 
-    void show() const override {     // overrides Person::show()
-        cout << "  " << left << setw(6) << id << setw(22) << name << setw(8) << course
-             << setw(7) << marks << grade() << "\n";
-    }
-
-    string toCSV() const {
-        return to_string(id) + "," + name + "," + course + "," + to_string(marks);
+    void show() override {
+        cout << id << "  " << name << "  " << marks << "  Grade " << grade() << endl;
     }
 };
 
-class Portal {
-    vector<Student> students;               // STL vector holds all the records
-    string fileName = "students_data.csv";
+vector<Student> students;
 
-public:
-    void load() {
-        ifstream in(fileName);
-        if (!in) {
-            cout << "(No saved file yet, starting fresh)\n";
-            return;
-        }
-        string line;
-        while (getline(in, line)) {
-            stringstream ss(line);
-            string id, name, course, marks;
-            if (getline(ss, id, ',') && getline(ss, name, ',') &&
-                getline(ss, course, ',') && getline(ss, marks)) {
-                try {
-                    students.push_back(Student(stoi(id), name, course, stoi(marks)));
-                } catch (...) {
-                    cout << "(Skipped a broken line in the file)\n";
-                }
-            }
-        }
-        cout << "(Loaded " << students.size() << " students from " << fileName << ")\n";
+void loadFile() {
+    ifstream in("students_data.csv");
+    string line;
+    while (getline(in, line)) {
+        stringstream ss(line);
+        string id, name, marks;
+        getline(ss, id, ',');
+        getline(ss, name, ',');
+        getline(ss, marks, ',');
+        students.push_back(Student(stoi(id), name, stoi(marks)));
     }
-
-    void save() const {
-        ofstream out(fileName);
-        if (!out) throw PortalError("Could not open " + fileName + " for saving");
-        for (const Student& s : students) out << s.toCSV() << "\n";
-    }
-
-    void add(int id, const string& name, const string& course, int marks) {
-        if (id <= 0) throw PortalError("ID must be a positive number");
-        for (const Student& s : students)
-            if (s.getId() == id) throw PortalError("ID " + to_string(id) + " is already taken");
-        if (name.empty() || course.empty()) throw PortalError("Name and course can't be empty");
-        if (name.find(',') != string::npos || course.find(',') != string::npos)
-            throw PortalError("Please don't use commas, they break the CSV file");
-        if (marks < 0 || marks > 100) throw PortalError("Marks should be between 0 and 100");
-        students.push_back(Student(id, name, course, marks));
-    }
-
-    const Student& find(int id) const {
-        for (const Student& s : students)
-            if (s.getId() == id) return s;
-        throw PortalError("No student with ID " + to_string(id));
-    }
-
-    void showAll() const {
-        if (students.empty()) {
-            cout << "  No students added yet\n";
-            return;
-        }
-        cout << "  " << left << setw(6) << "ID" << setw(22) << "Name" << setw(8) << "Course"
-             << setw(7) << "Marks" << "Grade\n";
-        int total = 0;
-        for (const Student& s : students) {
-            s.show();
-            total += s.getMarks();
-        }
-        cout << "  Class average: " << fixed << setprecision(2)
-             << (double)total / students.size() << "\n";
-    }
-};
-
-// keeps asking until the user actually types a number
-int readInt(const string& prompt) {
-    int x;
-    cout << prompt;
-    while (!(cin >> x)) {
-        if (cin.eof()) exit(0);
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "  That's not a number, try again: ";
-    }
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    return x;
+    cout << "(" << students.size() << " students loaded)" << endl;
 }
 
-string readText(const string& prompt) {
-    string s;
-    cout << prompt;
-    getline(cin, s);
-    return s;
+void saveFile() {
+    ofstream out("students_data.csv");
+    for (Student s : students)
+        out << s.id << "," << s.getName() << "," << s.marks << "\n";
+}
+
+string ask(string question) {
+    string answer;
+    cout << question;
+    getline(cin, answer);
+    return answer;
 }
 
 int main() {
-    Portal portal;
-    portal.load();
+    loadFile();
 
     while (true) {
-        cout << "\n----- STUDENT PORTAL -----\n"
-             << "1. Add student\n2. Show all students\n3. Search by ID\n4. Save and exit\n";
-        int choice = readInt("Your choice: ");
+        cout << "\n1. Add  2. Show all  3. Search  4. Save & exit" << endl;
+        string choice = ask("Choice: ");
 
         try {
-            if (choice == 1) {
-                int id = readInt("ID: ");
-                string name = readText("Name: ");
-                string course = readText("Course: ");
-                int marks = readInt("Marks (0-100): ");
-                portal.add(id, name, course, marks);
-                cout << "  Student added!\n";
-            } else if (choice == 2) {
-                portal.showAll();
-            } else if (choice == 3) {
-                const Student& s = portal.find(readInt("Enter ID: "));
-                s.show();
-            } else if (choice == 4) {
-                portal.save();
-                cout << "  Saved. See you next time!\n";
-                break;
-            } else {
-                cout << "  Please choose 1, 2, 3 or 4\n";
+            if (choice == "1") {
+                int id = stoi(ask("ID: "));
+                string name = ask("Name: ");
+                int marks = stoi(ask("Marks: "));
+
+                if (marks < 0 || marks > 100)
+                    throw runtime_error("marks must be 0 to 100");
+                for (Student s : students)
+                    if (s.id == id) throw runtime_error("this ID already exists");
+
+                students.push_back(Student(id, name, marks));
+                cout << "Student added" << endl;
             }
-        } catch (const PortalError& e) {
-            cout << "  Oops: " << e.what() << "\n";
+            else if (choice == "2") {
+                for (Student s : students) s.show();
+            }
+            else if (choice == "3") {
+                int id = stoi(ask("ID to search: "));
+                bool found = false;
+                for (Student s : students)
+                    if (s.id == id) { s.show(); found = true; }
+                if (!found) cout << "No student with ID " << id << endl;
+            }
+            else if (choice == "4") {
+                saveFile();
+                cout << "Saved. Bye!" << endl;
+                break;
+            }
+            else {
+                cout << "Please choose 1 to 4" << endl;
+            }
+        }
+        catch (invalid_argument&) {
+            cout << "Error: please type a number" << endl;
+        }
+        catch (runtime_error& e) {
+            cout << "Error: " << e.what() << endl;
         }
     }
     return 0;

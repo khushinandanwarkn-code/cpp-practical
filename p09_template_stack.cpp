@@ -1,70 +1,61 @@
-// Practical 09 - Generic Stack using Templates
+// Practical 09 - Generic Stack using Template
 // Khushboo Nandanwar | Roll No. 49 | AIDS-C
 #include <iostream>
 #include <vector>
 #include <string>
-#include <stdexcept>
 using namespace std;
 
 template <typename T>
 class Stack {
-    vector<T> items;   // vector does the memory work for us
+    vector<T> items;
 public:
-    void push(const T& value) { items.push_back(value); }
-
-    T pop() {
-        if (empty()) throw underflow_error("pop() called on an empty stack");
-        T top = items.back();
-        items.pop_back();
-        return top;
+    void push(T value) {
+        items.push_back(value);
     }
 
-    const T& peek() const {          // safe way to look at the next item
-        if (empty()) throw underflow_error("peek() called on an empty stack");
+    void pop() {
+        if (isEmpty()) {
+            cout << "Stack is empty, nothing to pop" << endl;
+            return;
+        }
+        cout << "Popped: " << items.back() << endl;
+        items.pop_back();
+    }
+
+    T top() {
+        if (isEmpty()) {
+            cout << "Stack is empty, no top item" << endl;
+            return T();
+        }
         return items.back();
     }
 
-    bool empty() const { return items.empty(); }
-    size_t size() const { return items.size(); }
+    bool isEmpty() {
+        return items.empty();
+    }
 };
 
-// one helper that also works for every type
-template <typename T>
-void emptyOut(Stack<T>& s, const string& label) {
-    cout << label << " (size " << s.size() << ", top = " << s.peek() << ") pops: ";
-    while (!s.empty()) cout << s.pop() << "  ";
-    cout << "\n";
-}
-
 int main() {
-    Stack<int> intStack;
-    for (int x : {10, 20, 30, 40}) intStack.push(x);
+    Stack<int> s1;
+    s1.push(10);
+    s1.push(20);
+    cout << "Top of int stack: " << s1.top() << endl;
+    s1.pop();
+    s1.pop();
+    s1.pop();           // empty now
 
-    Stack<float> floatStack;
-    floatStack.push(1.5f);
-    floatStack.push(2.75f);
-    floatStack.push(9.9f);
+    Stack<float> s2;
+    s2.push(1.5);
+    s2.push(2.5);
+    cout << "\nTop of float stack: " << s2.top() << endl;
+    s2.pop();
 
-    Stack<string> textStack;
-    textStack.push("Khushboo");
-    textStack.push("AIDS-C");
-    textStack.push("Roll-49");
-
-    emptyOut(intStack, "Stack<int>   ");
-    emptyOut(floatStack, "Stack<float> ");
-    emptyOut(textStack, "Stack<string>");
-
-    cout << "\nEmpty-stack test cases:\n";
-    try {
-        intStack.pop();
-    } catch (const underflow_error& e) {
-        cout << "  Caught: " << e.what() << "\n";
-    }
-    try {
-        textStack.peek();
-    } catch (const underflow_error& e) {
-        cout << "  Caught: " << e.what() << "\n";
-    }
-    cout << "  intStack.empty() = " << boolalpha << intStack.empty() << "\n";
+    Stack<string> s3;
+    s3.push("Hello");
+    s3.push("World");
+    cout << "\nTop of string stack: " << s3.top() << endl;
+    s3.pop();
+    s3.pop();
+    s3.top();           // empty now
     return 0;
 }

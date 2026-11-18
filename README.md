@@ -20,8 +20,8 @@ Khushboo Nandanwar | Roll No. 49 | AIDS-C
 ## How to compile and run
 Any practical compiles on its own, for example:
 
-    g++ -std=c++17 -Wall -o p01 p01_fundamentals.cpp
+    g++ p01_fundamentals.cpp -o p01
     ./p01          (on Windows: p01.exe)
 
-Practical 01 asks for input (name, roll number, division and 3 marks).
-Practical 11 creates students.csv and positions.txt in the folder it runs from.
+Practical 01 asks for your name, roll number and 3 marks.
+Practical 11 creates students.csv and demo.txt in the folder it runs from.
